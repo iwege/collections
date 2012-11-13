@@ -1,0 +1,83 @@
+<div id="codearea"><textarea style="display:none" id="bookmark">
+#group 搜索
+
+http://www.google.com.hk/
+谷歌
+
+http://www.baidu.com/
+百度
+</textarea><div id="options">
+		<button onclick="Edit()">Edit</button>
+		<button onclick="Save()">Save</button>
+		<button onclick="Export()">Export</button>
+	</div><style>
+	fieldset { border: 5px solid #dedede; -moz-border-radius: 5px; -khtml-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px; padding:10px; margin:20px; }
+	legend { font-size:12px; font-weight:bold; }
+
+	.link { float:left; height:30px; line-height:30px; font-size:14px; padding:0px 10px 0px 26px; margin:0px 10px 0px 0px; text-decoration:none; color:#555; position:relative; min-width:100px; }
+	.link:hover { background-color:#eeeeee!important; }
+	.link .icon { position:absolute; left:5px; top:7px; width:16px; height:16px; border-style:none; }
+	</style><script>
+
+	function link(href, text, p){
+		var obj = document.createElement("a");
+		obj.href = href;
+		obj.className = "link";
+		var img = document.createElement("img");
+		img.className = "icon";
+		img.onerror = function(){ img.style.display = "none"; };
+		img.src = href.replace(/\/[^\/]*$/, "") + "/favicon.ico";
+		obj.appendChild(img);
+		obj.appendChild(document.createTextNode(text));
+		(p || document.body).appendChild(obj);
+	}
+
+	function group(name, p){
+		var obj = document.createElement("fieldset");
+		var cap = document.createElement("legend");
+		cap.appendChild(document.createTextNode(name));
+		obj.appendChild(cap);
+		(p || document.body).appendChild(obj);
+		return obj;
+	}
+	var render = function(){
+		var s, w = [], p = document.getElementById('content');
+		s = document.getElementById("bookmark").value.split("\n");
+		
+		for (var i=0; i<s.length; i++) if (s[i]) {
+			s[i] = s[i].replace(/^\s+/, "").replace(/\s+$/, "");
+			if (s[i] && !/^\#/.test(s[i])) {
+				w.push(s[i]);
+				if (w.length == 2) {
+					link(w[0], w[1], p);
+					w = [];
+				}
+			} else if (/^\#group\s/.test(s[i])) {
+				p = group(s[i].substring(s[i].indexOf(" ")),document.getElementById('content'));
+			}
+		}
+	}
+	window.onload = render;
+	var Edit = function(){
+		document.getElementById('bookmark').style.display = 'block';
+	}
+	var Save = function(){
+		document.getElementById('bookmark').style.display = 'none';
+		document.getElementById('content').innerHTML = '';
+		document.getElementById('bookmark').innerHTML = document.getElementById('bookmark').value;
+		render();
+	}
+	var Export = function(){
+		var html = '<div id="codearea"><textarea style="display:none" id="bookmark">\n';
+		html += document.getElementById('bookmark').textContent;
+		html += '</textarea>';
+		html += document.getElementById('options').outerHTML;
+		html += "<style>";
+		html += document.getElementById('codearea').getElementsByTagName('style')[0].textContent;
+		html += "</style><script>";
+		html += document.getElementById('codearea').getElementsByTagName('script')[0].textContent;
+		html += "<"+'/script></div>\n<div id="content"></div>';
+		console.log(html);
+	}
+	</script></div>
+<div id="content"></div> 
